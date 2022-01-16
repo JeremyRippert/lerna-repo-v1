@@ -6,9 +6,6 @@ module.exports = {
     es6: true,
     jest: true,
   },
-  // parserOptions: {
-  //   project: ['./tsconfig.json', './packages/*/tsconfig.json'],
-  // },
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
@@ -23,7 +20,6 @@ module.exports = {
     '@typescript-eslint/no-inferrable-types': 'error',
     '@typescript-eslint/prefer-for-of': 'error',
     '@typescript-eslint/unified-signatures': 'error',
-    // '@typescript-eslint/prefer-nullish-coalescing': 'error',
     '@typescript-eslint/ban-ts-comment': 'warn',
     '@typescript-eslint/unbound-method': 'off',
     'dot-notation': 'error',

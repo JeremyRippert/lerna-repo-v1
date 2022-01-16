@@ -4,8 +4,11 @@ All steps followed to make this work:
 
 ## Initial setup
 
+```
 yarn add typescript -D -W
 yarn add @types/node -D -W
+yarn add -D -W ts-node
+```
 
 Root tsconfig from <https://www.baltuta.eu/posts/typescript-lerna-monorepo-the-setup> and `references` from <https://cryogenicplanet.tech/posts/typescript-monorepo>
 
@@ -176,3 +179,107 @@ The file must be included in at least one of the projects provided.eslint
 **Changing the names of these files solved the issue, WTF**. Restarting VSCode made the issue show up again, in the files with the new names.
 This really seems to be an issue with VSCode, let's set that aside for now and move on.
 Currently disabling `@typescript-eslint/prefer-nullish-coalescing` and removing `parserOptions.project`.
+
+## Add nextjs barebones
+
+yarn add -W react react-dom next next-transpile-modules
+yarn add -D -W @types/next @types/react
+cd packages && mkdir frontend && cd frontend && yarn init -y
+
+Base `package.json`:
+
+```
+{
+  "name": "@monorepo/frontend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "description": "> TODO: description",
+  "license": "MIT",
+  "dependencies": {
+    "@monorepo/shared": "*" // this is important
+  }
+}
+```
+
+Add `tsconfig.json`
+
+```
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "./src",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "noEmit": true
+  },
+  "include": ["./src"]
+}
+```
+
+Add `.eslintrc.js` in `packages/frontend`:
+
+```
+module.exports = {
+  extends: [
+    '../../.eslintrc.js',
+    'plugin:react/recommended',
+    'plugin:@typescript-eslint/recommended-requiring-type-checking',
+    'plugin:jest-dom/recommended',
+    'react-app',
+    'plugin:jsx-a11y/recommended',
+  ],
+  parser: '@typescript-eslint/parser',
+  overrides: [
+    {
+      files: ['**/*.ts', '**/*.tsx'],
+      parserOptions: {
+        project: './tsconfig.json',
+      },
+    },
+  ],
+  plugins: ['jest-dom', 'testing-library', 'import', 'jsx-a11y', 'risxss'],
+  settings: {
+    react: {
+      version: 'detect',
+    },
+  },
+  rules: {
+    'react/prop-types': 'off',
+    'react/react-in-jsx-scope': 'off',
+    'react/no-string-refs': 'warn',
+    'react-hooks/rules-of-hooks': 'error',
+    'react-hooks/exhaustive-deps': 'warn',
+    '@typescript-eslint/prefer-nullish-coalescing': 'error',
+    // Specific NextJS accessibility config
+    // Not necessary with NextJS links
+    'jsx-a11y/anchor-is-valid': 'off',
+    // Add alt attributes to NextJS Images
+    'jsx-a11y/alt-text': [
+      2,
+      {
+        img: ['Image'],
+      },
+    ],
+    'risxss/catch-potential-xss-react': 'error',
+    'react/display-name': 'off',
+  },
+};
+```
+
+And packages:
+
+```
+lerna add -D --scope=@monorepo/frontend eslint-plugin-react
+lerna add -D --scope=@monorepo/frontend eslint-plugin-jest-dom
+lerna add -D --scope=@monorepo/frontend eslint-config-next
+lerna add -D --scope=@monorepo/frontend eslint-config-react-app
+lerna add -D --scope=@monorepo/frontend eslint-plugin-react-app
+lerna add -D --scope=@monorepo/frontend eslint-plugin-risxss
+```
+
+Note that in this case, the override works within VSCode and cli (at least when only `pages/_app.tsx` and `pages/index.tsx` exist).
+
+Next step: import something from `@monorepo/shared`
+
+First issue: if I add `import {} from '@monorepo/shared';` in `index.tsx`, I get an error message `Cannot find module '@monorepo/shared' or its corresponding type declarations`
+
+I had to set `"main": "src/index.tsx"` in `packages/shared/package.json`

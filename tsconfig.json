@@ -24,5 +24,10 @@
     "composite": true
   },
   // required for monorepo?
-  "references": [{ "path": "./packages/shared/tsconfig.json" }]
+  "references": [
+    { "path": "./packages/shared/tsconfig.json" }
+    // Commented because otherwise we get error
+    // Referenced project '/home/jeremy/dev/jeremy/templates/lerna-repo/packages/frontend/tsconfig.json' may not disable emit.
+    // { "path": "./packages/frontend/tsconfig.json" }
+  ]
 }
