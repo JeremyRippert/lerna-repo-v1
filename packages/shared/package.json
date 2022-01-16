@@ -1,5 +1,5 @@
 {
-  "name": "shared",
+  "name": "@monorepo/shared",
   "version": "1.0.0",
   "description": "> TODO: description",
   "author": "jeremyr23 <jeremyr@theodo.fr>",
@@ -15,7 +15,9 @@
   ],
   "scripts": {
     "test": "echo \"Error: run tests from root\" && exit 1",
-    "start": "tsc -p ./tsconfig.json"
+    "start": "tsc -p ./tsconfig.json",
+    "lint": "eslint --ext=jsx,ts,tsx src",
+    "lint:fix": "eslint --ext=jsx,ts,tsx src --fix"
   },
   "devDependencies": {}
 }
