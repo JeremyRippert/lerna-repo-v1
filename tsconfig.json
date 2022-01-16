@@ -1,0 +1,28 @@
+// tsconfig.json
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+
+    // are those needed?
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+
+    "strict": true,
+
+    "skipLibCheck": true,
+
+    // should probable change
+    "jsx": "react",
+
+    "esModuleInterop": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "target": "es2015",
+
+    // required for monorepo
+    "composite": true
+  },
+  // required for monorepo?
+  "references": [{ "path": "./packages/shared/" }]
+}
