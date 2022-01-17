@@ -1,7 +1,7 @@
 const TEST_REGEX = '(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|js?|tsx?|ts?)$';
 
 module.exports = {
-  roots: ['<rootDir>/src', '<rootDir>/tests'],
+  roots: ['<rootDir>/src'],
   transform: {
     '^.+\\.ts$': 'ts-jest',
     '^.+\\.tsx$': 'ts-jest',

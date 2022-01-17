@@ -1,4 +1,4 @@
-import { getTiti, getToto } from '../src/toto';
+import { getTiti, getToto } from '../toto';
 
 test('toto', () => {
   expect(getToto()).toEqual('toto');
