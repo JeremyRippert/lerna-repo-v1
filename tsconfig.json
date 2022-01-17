@@ -1,8 +1,6 @@
 // tsconfig.json
 {
   "compilerOptions": {
-    "baseUrl": ".",
-
     // are those needed?
     "declaration": true,
     "declarationMap": true,
@@ -13,7 +11,7 @@
     "skipLibCheck": true,
 
     // should probable change
-    "jsx": "react",
+    "jsx": "preserve",
 
     "esModuleInterop": true,
     "module": "commonjs",
@@ -21,12 +19,17 @@
     "target": "es2015",
 
     // required for monorepo
-    "composite": true
+    "composite": true,
+
+    "paths": {
+      "@monorepo/*": ["./packages/*/src"]
+    }
   },
+  "exclude": ["node_modules"],
   // required for monorepo?
   "references": [
     { "path": "./packages/shared/tsconfig.json" }
-    // Commented because otherwise we get error
+    // Commented because otherwise we get error, and we can't set `noEmit: false` for Nextjs
     // Referenced project '/home/jeremy/dev/jeremy/templates/lerna-repo/packages/frontend/tsconfig.json' may not disable emit.
     // { "path": "./packages/frontend/tsconfig.json" }
   ]
