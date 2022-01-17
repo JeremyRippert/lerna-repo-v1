@@ -13,7 +13,8 @@
     "lint": "eslint --ext=jsx,ts,tsx src",
     "lint:fix": "eslint --ext=jsx,ts,tsx src --fix",
     "test": "jest",
-    "postinstall": "expo-yarn-workspaces postinstall"
+    "postinstall": "expo-yarn-workspaces postinstall",
+    "build:apk": "eas build --platform android --profile productionApk"
   },
   "dependencies": {
     "@monorepo/shared": "^1.0.0",

@@ -1,0 +1,29 @@
+{
+  "cli": {
+    "version": ">= 0.43.0"
+  },
+  "build": {
+    "production": {
+      "node": "16.13.0",
+      "env": {
+        "BASE_BACKEND_URL": "https://jeremyrdjangotemplate.herokuapp.com/",
+        "ENTRY_FILE": "./__generated__/AppEntry.js"
+      }
+    },
+    "productionApk": {
+      "extends": "production",
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "development": {
+      "extends": "production",
+      "developmentClient": true,
+      "distribution": "internal"
+    },
+    "preview": { "extends": "production", "distribution": "internal" }
+  },
+  "submit": {
+    "production": {}
+  }
+}
