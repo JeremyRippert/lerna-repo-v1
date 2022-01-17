@@ -5,7 +5,7 @@
   "author": "jeremyr23 <jeremyr@theodo.fr>",
   "homepage": "",
   "license": "ISC",
-  "main": "src/index.tsx",
+  "main": "dist/src/index.jsx",
   "directories": {
     "lib": "lib",
     "test": "__tests__"
@@ -14,7 +14,7 @@
     "lib"
   ],
   "scripts": {
-    "build": "tsc -b ./tsconfig.json",
+    "build": "rimraf dist && tsc -b ./tsconfig.json",
     "clean": "rm -rf ./dist && rm tsconfig.tsbuildinfo",
     "watch": "tsc -b -w --preserveWatchOutput",
     "tsc": "tsc -p ./tsconfig.json",
@@ -23,6 +23,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "rimraf": "^3.0.2",
     "ts-jest": "^27.1.3"
   }
 }

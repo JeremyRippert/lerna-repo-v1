@@ -672,3 +672,41 @@ Multiple configurations found:
 
 Let's see if we can factorize all that.
 With a bit of refactoring, I managed to extend `jest.config.base.js`, even in `backend/src/tests/jest-e2e.js`.
+
+## Build NestJs
+
+I tried to do `rimraf dist && nest build`, then `node dist/main`, and encountered an error:
+
+```
+@monorepo/backend: $ node dist/main
+@monorepo/backend: /home/jeremy/dev/jeremy/templates/lerna-repo/packages/shared/src/index.tsx:1
+@monorepo/backend: import { apiRoutes } from './utils/apiRoutes';
+@monorepo/backend: ^^^^^^
+@monorepo/backend: SyntaxError: Cannot use import statement outside a module
+```
+
+I wondered why it would try to import from `shared/src/index.tsx`, and not `shared/src/dist/index.jsx`, turns out it was because of `"main": "src/index.tsx",` in `shared/package/json`. I replaced it with `"main": "dist/src/index.jsx",` and boom, `node dist/main` works. :tada:
+
+Let's see if I still have the hot reload in development.
+By running the build command on watch mode in `shared`, we have hot reload on all apps. :tada:
+
+## Summary
+
+I have built a monorepo with 4 packages:
+
+- backend, a barebones NestJs
+- frontend, a barebones NextJs
+- mobile, a barebones ReactNative
+- shared, a module imported by the other 3
+
+By running `yarn dev:shared`, `yarn dev:backend`, `yarn dev:frontend` and `yarn dev:mobile`, I have all 3 apps running with hot reload, including from shared.
+I can build the apps (I need to check if I have add commands to build `shared` before building frontend on vercel, I think I do because `dist` shouldn't be in the repo), and deploy NextJs and React Native. I will work on deploying NestJs tomorrow.
+
+Next steps:
+
+- fix build command on vercel
+- deploy backend on Heroku, link with a DB (start with this article <https://blog.tooljet.com/deploying-nest-js-application-on-heroku/>)
+- extend root `.eslintrc.js` in `backend`
+- extend root `tsconfig.json` in `backend`
+- verify I have installed all developer tools that are on my other templates
+- start adding features

@@ -4,6 +4,8 @@ import { toto } from '@monorepo/shared';
 @Injectable()
 export class AppService {
   getHello(): string {
-    return toto;
+    console.log('i am there');
+
+    return `Toto is ${toto}, right?`;
   }
 }
