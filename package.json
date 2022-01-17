@@ -8,7 +8,9 @@
     "watch": "lerna run watch --stream",
     "clean": "lerna run clean --parallel",
     "lint": "lerna run lint --parallel",
-    "test": "lerna run test  --parallel"
+    "test": "lerna run test  --parallel",
+    "tsc": "lerna run tsc  --parallel",
+    "build:vercel": "cd packages/frontend && yarn run next build && cd ../.. && cp -r ./packages/frontend/.next . && cp -r ./packages/frontend/src/public ."
   },
   "dependencies": {
     "next": "^12.0.8",

@@ -428,3 +428,40 @@ transform: {
 ```
 
 Missing the line `'^.+\\.tsx$': 'ts-jest',`
+
+## Summary
+
+At this point, we have two packages: `frontend` and `shared`. `frontend` imports functions and constants from `shared`.
+Both packages have `tsc`, `lint` and `test` enabled.
+Next step: deploy `frontend` to vercel, before moving on to adding our next package: `mobile`.
+
+## Adding public folder and importing image
+
+First, we notice that since `next` isn't in our dependencies, we don't have auto-import for `next/image`. We'll look into that later.
+
+However, when I try to do `import logo from 'public/vercel.svg';`, I get a TS error (but the code works in dev)
+
+```
+Cannot find module 'public/vercel.svg' or its corresponding type declarations
+```
+
+Since it is a ts error, it will prevent use from compiling and therefore deploying our code to Vercel, so we need to fix it.
+I've tried adding `.babelrc`, as in my other nextjs monorepo, without success.
+Adding `frontend/types/index.d.ts` with content
+
+```
+declare module '*.svg' {
+  const component: React.FC<React.SVGProps<SVGSVGElement>>;
+
+  export default component;
+}
+```
+
+solved the TS issue.
+However, we still get an eslint error `Unsafe assignment of an any value`, **only in VSCode**. Restarting VSCode doesn't solve the issue.
+Adding `"eslint.workingDirectories": ["packages/frontend"]` in `.vscode/settings.json` solved the issue.
+
+## Deploying next to vercel
+
+Let's run `yarn build:vercel` locally. It runs successfully.
+Let's deploy our repository to vercel.

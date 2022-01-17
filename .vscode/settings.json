@@ -1,1 +1,1 @@
-{ "cSpell.enabled": false }
+{ "cSpell.enabled": false, "eslint.workingDirectories": ["packages/frontend"] }

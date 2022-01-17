@@ -1,0 +1,42 @@
+@font-face {
+  font-family: 'Lato';
+  src: url('./Lato/Lato-Light.ttf');
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Lato';
+  src: url('./Lato/Lato-Regular.ttf');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Lato';
+  src: url('./Lato/Lato-Bold.ttf');
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Montserrat';
+  src: url('./Montserrat/Montserrat-Light.ttf');
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Montserrat';
+  src: url('./Montserrat/Montserrat-Regular.ttf');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Montserrat';
+  src: url('./Montserrat/Montserrat-Bold.ttf');
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+}
