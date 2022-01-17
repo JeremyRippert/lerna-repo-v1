@@ -464,4 +464,126 @@ Adding `"eslint.workingDirectories": ["packages/frontend"]` in `.vscode/settings
 ## Deploying next to vercel
 
 Let's run `yarn build:vercel` locally. It runs successfully.
-Let's deploy our repository to vercel.
+Let's deploy our repository to vercel. It worked on first try! :tada:
+
+## Adding React Native
+
+Following <https://docs.expo.dev/guides/monorepos/>
+`expo init packages/mobile`, and select blank template
+Create `metro.config.js`, update `package.json` as said in the docs.
+Let's run `yarn dev:mobile` from root. We get
+
+```
+@monorepo/mobile: [18:47:56] Unable to resolve module react-native from /home/jeremy/dev/jeremy/templates/lerna-repo/node_modules/expo/build/Expo.fx.js: react-native could not be found within the project or in these directories:
+@monorepo/mobile: [18:47:56]   ../../node_modules/expo/node_modules
+@monorepo/mobile: [18:47:56]   ../../node_modules
+```
+
+The error message kind of makes sense, since `react-native` is in `packages/mobile/node_modules`. But why doesn't it look there?
+However, looking at the source, of the error, we see the file tying to import `react-native` is `lerna-repo/node_modules/expo/build/Expo.fx.js`
+
+Let's look at our `metro.config.js` in our other monorepo. It is different. First, let's copy/paste it blindly and see what happens. Now we have another error:
+
+```
+@monorepo/mobile: [18:53:07] Unable to resolve module @babel/runtime/helpers/interopRequireDefault from /home/jeremy/dev/jeremy/templates/lerna-repo/packages/mobile/index.js: @babel/runtime/helpers/interopRequireDefault could not be found within the project or in these directories:
+@monorepo/mobile: [18:53:07]   node_modules
+@monorepo/mobile: [18:53:07]   node_modules
+@monorepo/mobile: [18:53:07]   ../../node_modules
+```
+
+Multiple sources say to add `@babel/runtime` to `dependencies` to fix this. Let's try that. It didn't work.
+Googling that error showed me that I encountered it before, if I had taken notes last time it would have been faster this time.
+I tried to clear the cache with `expo r -c`, without success. Let's add `@babel/core`. Still doesn't work.
+Let's delete all `node_modules` and try again. Still doesn't work.
+Let's try adding `'module:metro-react-native-babel-preset'` to babel presets (because it is in the other monorepo). Still doesn't work.
+
+Let's get back to the config suggested by expo and work from there.
+Again, we get our error
+
+```
+@monorepo/mobile: [19:09:51] Unable to resolve module react-native from /home/jeremy/dev/jeremy/templates/lerna-repo/node_modules/expo/build/Expo.fx.js: react-native could not be found within the project or in these directories:
+@monorepo/mobile: [19:09:51]   ../../node_modules/expo/node_modules
+@monorepo/mobile: [19:09:51]   ../../node_modules
+```
+
+First, let's reword the file to have `module.exports = (...)`. Then, let's update `workspaceRoot` from `path.resolve(__dirname, '../..')` to `__dirname + '/../..'`
+
+**All of the above didn't work, so I decided to go with the `expo-yarn-workspaces` route.**
+Heavily inspired by <https://github.com/expo/expo/tree/master/packages/expo-yarn-workspaces>
+
+```
+lerna add --scope=@monorepo/mobile -D expo-yarn-workspaces
+```
+
+Add `"postinstall": "expo-yarn-workspaces postinstall"` in `packages/mobile/package.json`.
+Updated `"bootstrap": "yarn install; lerna bootstrap; lerna run --scope=@monorepo/mobile postinstall",`
+In root `package.json`, replace `"workspaces"` by
+
+```
+"workspaces": {
+    "packages": [
+      "packages/*"
+    ],
+    "nohoist": [
+      "**/react-native",
+      "**/react-native/**",
+      "**/expo",
+      "**/expo/**"
+    ]
+  }
+```
+
+`yarn add -W metro-config` to fix
+
+```
+@monorepo/mobile: [21:08:23] Starting project at /home/jeremy/dev/jeremy/templates/lerna-repo/packages/mobile
+@monorepo/mobile: [21:08:23] Developer tools running on http://localhost:19002
+@monorepo/mobile: [21:08:25] Cannot find module 'metro-config/src/defaults/defaults'
+```
+
+At first, used `metro.config.js` provided by `expo-yarn-workspaces`:
+
+```
+const { createMetroConfiguration } = require('expo-yarn-workspaces');
+
+module.exports = createMetroConfiguration(__dirname);
+```
+
+And got error:
+
+```
+@monorepo/mobile: [21:13:26] Unable to resolve module react-native from /home/jeremy/dev/jeremy/templates/lerna-repo/node_modules/expo-status-bar/build/setStatusBarNetworkActivityIndicatorVisible.js: react-native could not be found within the project or in these directories:
+@monorepo/mobile: [21:13:26]   ../../node_modules
+@monorepo/mobile: [21:13:26]
+@monorepo/mobile: [21:13:26] If you are sure the module exists, try these steps:
+@monorepo/mobile: [21:13:26]  1. Clear watchman watches: watchman watch-del-all
+@monorepo/mobile: [21:13:26]  2. Delete node_modules and run yarn install
+@monorepo/mobile: [21:13:26]  3. Reset Metro's cache: yarn start --reset-cache
+@monorepo/mobile: [21:13:26]  4. Remove the cache: rm -rf /tmp/metro-*
+@monorepo/mobile: [21:13:26] > 1 | import { StatusBar } from 'react-native';
+```
+
+So, I took a bit of config from the other monorepo, and finally `metro.config.js` looks like
+
+```
+const { createMetroConfiguration } = require('expo-yarn-workspaces');
+
+const path = require('path');
+
+const config = createMetroConfiguration(__dirname);
+const nodeModulesPaths = [path.resolve(path.join(__dirname, './node_modules'))];
+config.resolver.nodeModulesPaths = nodeModulesPaths;
+
+module.exports = config;
+```
+
+Which works (the app compiles and I can import `toto` from `@monorepo/shared`).
+Auto-import is the same as in `frontend`.
+
+To add jest, I copied the files from `frontend`. Amazing, it worked.
+
+I now have a few eslint errors in vscode, in `.js` files where I use `require` (but I don't have them in `frontend`).
+I tried adding `"packages/mobile", "packages/shared` in `.vscode/settings.json`, which didn't work.
+It doesn't seem easy to fix, and honestly isn't that much of a big deal right now.
+
+## Compiling React Native app

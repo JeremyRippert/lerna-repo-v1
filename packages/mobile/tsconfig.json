@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "./src",
+    "noEmit": true
+  },
+  "include": ["./src", "./App.tsx"],
+  "exclude": ["node_modules"]
+}

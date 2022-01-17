@@ -2,8 +2,10 @@
   "name": "monorepo-template",
   "private": true,
   "scripts": {
-    "bootstrap": "yarn install; lerna bootstrap;",
+    "bootstrap": "yarn install; lerna bootstrap; lerna run --scope=@monorepo/mobile postinstall",
     "dev:frontend": "lerna run --scope @monorepo/frontend --stream dev",
+    "dev:mobile": "lerna run --scope @monorepo/mobile --stream start",
+    "dev:mobile:clear": "lerna run --scope @monorepo/mobile --stream start:clear",
     "build": "lerna run build --stream",
     "watch": "lerna run watch --stream",
     "clean": "lerna run clean --parallel",
@@ -13,6 +15,7 @@
     "build:vercel": "cd packages/frontend && yarn run next build && cd ../.. && cp -r ./packages/frontend/.next . && cp -r ./packages/frontend/src/public ."
   },
   "dependencies": {
+    "metro-config": "^0.66.2",
     "next": "^12.0.8",
     "react": "^17.0.2",
     "react-dom": "^17.0.2"
@@ -34,7 +37,15 @@
     "ts-node": "^10.4.0",
     "typescript": "^4.5.4"
   },
-  "workspaces": [
-    "packages/*"
-  ]
+  "workspaces": {
+    "packages": [
+      "packages/*"
+    ],
+    "nohoist": [
+      "**/react-native",
+      "**/react-native/**",
+      "**/expo",
+      "**/expo/**"
+    ]
+  }
 }
