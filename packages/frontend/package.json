@@ -5,7 +5,7 @@
   "description": "> TODO: description",
   "license": "MIT",
   "scripts": {
-    "dev": "next dev",
+    "start": "next dev",
     "tsc": "tsc -p ./tsconfig.json",
     "lint": "eslint --ext=jsx,ts,tsx src",
     "lint:fix": "eslint --ext=jsx,ts,tsx src --fix",

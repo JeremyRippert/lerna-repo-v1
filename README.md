@@ -587,3 +587,88 @@ I tried adding `"packages/mobile", "packages/shared` in `.vscode/settings.json`,
 It doesn't seem easy to fix, and honestly isn't that much of a big deal right now.
 
 ## Compiling React Native app
+
+We are going to use EAS. First, I copied `eas.json` from my react native template:
+
+```
+{
+  "cli": {
+    "version": ">= 0.43.0"
+  },
+  "build": {
+    "production": {
+      "node": "16.13.0",
+      "env": {
+        "BASE_BACKEND_URL": "https://jeremyrdjangotemplate.herokuapp.com/"
+      }
+    },
+    "productionApk": {
+      "extends": "production",
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "development": {
+      "extends": "production",
+      "developmentClient": true,
+      "distribution": "internal"
+    },
+    "preview": { "extends": "production", "distribution": "internal" }
+  },
+  "submit": {
+    "production": {}
+  }
+}
+```
+
+Per the `expo-yarn-workspaces` documentation, I should add the env variable `"ENTRY_FILE": "./__generated__/AppEntry.js"`
+Let's add `"build:apk": "eas build --platform android --profile productionApk"` to `scripts` in `packages/mobile/package.json` and `"build:apk": "lerna run --scope=@monorepo/mobile --stream build:apk"` in root `package.json`
+Got error
+
+```
+@monorepo/mobile: - Linking to project @jeremyr/mobile
+@monorepo/mobile: ✔ Created @jeremyr/mobile (​https://expo.dev/accounts/jeremyr/projects/mobile​) on Expo
+@monorepo/mobile: 📝  Android application id Learn more: https://expo.fyi/android-package
+@monorepo/mobile:     Error: Input is required, but stdin is not readable.
+```
+
+This message seems to indicate that `eas` prompts things to the user. Let's build `yarn build:apk` from `packages/mobile`. It asked `Generate a new Android Keystor?`. Success!
+
+Now that the build is done, let's try it again from the root. It works! :tada:
+
+## Add Nest
+
+Documentation about NestJs in this kind of monorepo doesn't seem super straightforward, as it was the case for Expo.
+So let's start by creating a regular nest project with `nest new packages/backend`.
+
+Let's start by adding `@monorepo/shared` to `packages/backend/package.json`, and change the app name to `@monorepo/backend`.
+The project actually comes with a lot of libraries installed, like eslint, prettier, ts.
+
+If we run `yarn dev:backend`, we get a nice "Hello World!" on `localhost:3000`.
+Let's try running the tests. Everything passes. Amazing.
+
+Let's bootstrap the repo and try to import `toto` from shared.
+
+If I put `import {} from '@monorepo/shared';` in `backend/src/app.service.ts`, I get ts error:
+
+```
+Module '@monorepo/shared' was resolved to '/home/jeremy/dev/jeremy/templates/lerna-repo/packages/shared/src/index.tsx', but '--jsx' is not set
+```
+
+Setting `"jsx": "preserve"` in `tsconfig.json` solves the issue (I also needed to restart VSCode). With that, auto importe once `import {} from '@monorepo/shared';` is present works. Let's see if it works when running Nest. It. Does. Amazing.
+
+But now, `jest` fails in `backend` with the classic `SyntaxError: Cannot use import statement outside a module`. Let's create a `jest.config.js` to try and fix that.
+
+Now we get
+
+```
+Multiple configurations found:
+    * /home/jeremy/dev/jeremy/templates/lerna-repo/packages/backend/jest.config.js
+    * `jest` key in /home/jeremy/dev/jeremy/templates/lerna-repo/packages/backend/package.json
+
+  Implicit config resolution does not allow multiple configuration files.
+  Either remove unused config files or select one explicitly with `--config`.
+```
+
+Let's see if we can factorize all that.
+With a bit of refactoring, I managed to extend `jest.config.base.js`, even in `backend/src/tests/jest-e2e.js`.

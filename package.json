@@ -3,7 +3,8 @@
   "private": true,
   "scripts": {
     "bootstrap": "yarn install; lerna bootstrap; lerna run --scope=@monorepo/mobile postinstall",
-    "dev:frontend": "lerna run --scope @monorepo/frontend --stream dev",
+    "dev:backend": "lerna run --scope @monorepo/backend --stream start",
+    "dev:frontend": "lerna run --scope @monorepo/frontend --stream start",
     "dev:mobile": "lerna run --scope @monorepo/mobile --stream start",
     "dev:mobile:clear": "lerna run --scope @monorepo/mobile --stream start:clear",
     "build": "lerna run build --stream",
@@ -12,7 +13,8 @@
     "lint": "lerna run lint --parallel",
     "test": "lerna run test  --parallel",
     "tsc": "lerna run tsc  --parallel",
-    "build:vercel": "cd packages/frontend && yarn run next build && cd ../.. && cp -r ./packages/frontend/.next . && cp -r ./packages/frontend/src/public ."
+    "build:vercel": "cd packages/frontend && yarn run next build && cd ../.. && cp -r ./packages/frontend/.next . && cp -r ./packages/frontend/src/public .",
+    "build:apk": "lerna run --scope=@monorepo/mobile --stream build:apk"
   },
   "dependencies": {
     "metro-config": "^0.66.2",
