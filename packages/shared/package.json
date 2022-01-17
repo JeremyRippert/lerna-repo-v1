@@ -5,7 +5,7 @@
   "author": "jeremyr23 <jeremyr@theodo.fr>",
   "homepage": "",
   "license": "ISC",
-  "main": "index.js",
+  "main": "src/index.tsx",
   "directories": {
     "lib": "lib",
     "test": "__tests__"
@@ -14,10 +14,15 @@
     "lib"
   ],
   "scripts": {
-    "test": "echo \"Error: run tests from root\" && exit 1",
-    "start": "tsc -p ./tsconfig.json",
+    "build": "tsc -b ./tsconfig.json",
+    "clean": "rm -rf ./dist && rm tsconfig.tsbuildinfo",
+    "watch": "tsc -b -w --preserveWatchOutput",
+    "tsc": "tsc -p ./tsconfig.json",
     "lint": "eslint --ext=jsx,ts,tsx src",
-    "lint:fix": "eslint --ext=jsx,ts,tsx src --fix"
+    "lint:fix": "eslint --ext=jsx,ts,tsx src --fix",
+    "test": "jest"
   },
-  "devDependencies": {}
+  "dependencies": {
+    "ts-jest": "^27.1.3"
+  }
 }
