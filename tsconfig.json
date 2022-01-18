@@ -10,7 +10,7 @@
 
     "skipLibCheck": true,
 
-    // should probable change
+    // should probably change
     "jsx": "preserve",
 
     "esModuleInterop": true,

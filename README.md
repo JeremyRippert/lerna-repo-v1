@@ -704,9 +704,48 @@ I can build the apps (I need to check if I have add commands to build `shared` b
 
 Next steps:
 
-- fix build command on vercel
-- deploy backend on Heroku, link with a DB (start with this article <https://blog.tooljet.com/deploying-nest-js-application-on-heroku/>)
 - extend root `.eslintrc.js` in `backend`
 - extend root `tsconfig.json` in `backend`
+- fix build command on vercel
+- dockerize backend, add postgres
+- deploy backend on Heroku, link with a DB (start with this article <https://blog.tooljet.com/deploying-nest-js-application-on-heroku/>)
 - verify I have installed all developer tools that are on my other templates
 - start adding features
+
+## Extend eslintrc and tsconfig in Nest
+
+`.eslintrc.js` simply becomes
+
+```
+module.exports = {
+  extends: ['../../.eslintrc.js'],
+  parserOptions: {
+    project: 'tsconfig.json',
+    sourceType: 'module',
+  },
+};
+```
+
+`tsconfig.json` simply becomes
+
+```
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "outDir": "./dist",
+    "baseUrl": "./src",
+    "incremental": true,
+    "forceConsistentCasingInFileNames": false,
+    "target": "es2017"
+  },
+  "include": ["./src"],
+  "exclude": ["node_modules"]
+}
+```
+
+## Fix build command on vercel
+
+Let's try to push main again an see what happens.
