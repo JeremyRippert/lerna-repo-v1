@@ -1,0 +1,19 @@
+FROM node:14.18-alpine
+
+RUN npm i -g lerna
+
+WORKDIR /usr/src/app
+
+COPY package.json ./
+COPY yarn.lock ./
+COPY packages/backend/package.json ./packages/backend/
+COPY packages/shared/package.json ./packages/shared/
+COPY lerna.json ./
+RUN yarn install
+
+RUN lerna bootstrap
+COPY . .
+
+EXPOSE 3000
+
+CMD [ "yarn", "dev:backend" ]

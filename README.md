@@ -769,3 +769,73 @@ Note: I could have simply deleted `shared/dist` locally and run `yarn build:verc
 Let's build without deleting `shared/dist`. It worked. Let's remove `shared/dist` and see if we have the same error as in vercel.
 We indeed have the same error message. Nice.
 Let's add `yarn build:shared` at the beginning of `build:vercel`, and retry locally. It worked. Let's push and see what happens.
+It works! :tada:
+
+## Dockerize backend, add postgres
+
+Let's add `docker-compose.yml` and `Dockerfile.local` to begin with. First, I create them at root so I can access `shared` in Dockerfile.
+
+`docker-compose.yaml`
+
+```
+version: '3.7'
+
+services:
+  backend:
+    container_name: backend
+    build:
+      context: .
+      dockerfile: Dockerfile.local
+    restart: always
+    volumes:
+      - ./:/usr/src/app
+    ports:
+      - '8000:3000'
+    depends_on:
+      - db
+
+  db:
+    image: postgres:10.6-alpine
+    environment:
+      - POSTGRES_DB=db-pg
+      - POSTGRES_USER=db-pg
+      - POSTGRES_PASSWORD=!ChangeMe!
+    volumes:
+      - db-data:/var/lib/postgresql/data:rw
+    ports:
+      - '5432:5432'
+
+volumes:
+  db-data: {}
+```
+
+`Dockerfile.local`
+
+```
+FROM node:14.18-alpine
+
+RUN npm i -g lerna
+
+WORKDIR /usr/src/app
+
+COPY package.json ./
+COPY yarn.lock ./
+COPY packages/backend/package.json ./packages/backend/
+COPY packages/shared/package.json ./packages/shared/
+COPY lerna.json ./
+RUN yarn install
+
+RUN lerna bootstrap
+COPY . .
+
+EXPOSE 3000
+
+CMD [ "yarn", "dev:backend" ]
+```
+
+With this configuration, we have hot reload on `backend`, and if we run `yarn dev:shared` in parallel, also hot reload on `shared`.
+
+The only other tweak I had to do is put `"@monorepo/shared": "file:../shared",` in `backend/package.json`. Let's check if it was necessary.
+If I put it back as before, it works too.
+
+Note: db seems to persist between up & down.
