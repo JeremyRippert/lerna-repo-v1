@@ -16,7 +16,7 @@
     "lint": "lerna run lint --parallel",
     "test": "lerna run test  --parallel",
     "tsc": "lerna run tsc  --parallel",
-    "build:vercel": "cd packages/frontend && yarn run next build && cd ../.. && cp -r ./packages/frontend/.next . && cp -r ./packages/frontend/src/public .",
+    "build:vercel": "yarn build:shared && cd packages/frontend && yarn run next build && cd ../.. && cp -r ./packages/frontend/.next . && cp -r ./packages/frontend/src/public .",
     "build:apk": "lerna run --scope=@monorepo/mobile --stream build:apk",
     "backend:prod": "lerna run --scope @monorepo/backend --stream start:prod"
   },

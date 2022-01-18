@@ -748,4 +748,24 @@ module.exports = {
 
 ## Fix build command on vercel
 
-Let's try to push main again an see what happens.
+Let's try to push main again an see what happens. I expect the command to fail since `shared/dist` isn't there.
+The build indeed fails with message:
+
+```
+info  - Checking validity of types...
+Failed to compile.
+./src/pages/index.tsx:5:33
+Type error: Cannot find module '@monorepo/shared' or its corresponding type declarations.
+  3 | import logo from 'public/vercel.svg';
+  4 |
+> 5 | import { apiRoutes, toto } from '@monorepo/shared';
+  6 |
+  7 | console.log('hey');
+  8 |
+error Command failed with exit code 1.
+```
+
+Note: I could have simply deleted `shared/dist` locally and run `yarn build:vercel` to do it locally.
+Let's build without deleting `shared/dist`. It worked. Let's remove `shared/dist` and see if we have the same error as in vercel.
+We indeed have the same error message. Nice.
+Let's add `yarn build:shared` at the beginning of `build:vercel`, and retry locally. It worked. Let's push and see what happens.
