@@ -2,8 +2,6 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 import { toto } from '@monorepo/shared';
 
-console.log('hey');
-
 export default function App() {
   return (
     <View style={styles.container}>

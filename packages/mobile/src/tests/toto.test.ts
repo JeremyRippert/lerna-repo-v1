@@ -1,7 +1,8 @@
+import { toto } from '@monorepo/shared';
 import { getTiti, getToto } from '../toto';
 
 test('toto', () => {
-  expect(getToto()).toEqual('toto');
+  expect(getToto()).toEqual(toto);
 });
 
 test('titi', () => {

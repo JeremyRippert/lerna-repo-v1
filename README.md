@@ -13,13 +13,17 @@ With following features:
 
 - everything is written in Typescript
 - all packages have jest, eslint and typechecking
-- all packages (except `shared`) can import stuff from `shared`, with correct typechecking, and if you add `import {} from '@monorepo/shared'` at the top of a file, you'll even have auto import from your IDE (I personally use VSCode)
+- all packages (except `shared`) can import stuff from `shared`, with correct typechecking. If suggestions don't show up as they should, try adding `import {} from '@monorepo/shared'` at the top of a file.
 
 ## Local Development
 
 ### Requirements
 
 Node >= 14.
+
+Lerna `npm install -g lerna`.
+
+EAS `npm install -g eas-cli`.
 
 [Expo Go](https://expo.dev/client) to develop on mobile.
 
@@ -29,13 +33,13 @@ Node >= 14.
 
 ### Dev
 
-From the root (I suggest running those commands in separate terminal windows):
+From the root, (I suggest running those commands in separate terminal windows):
 
 ```
-yarn dev:shared
+yarn dev:shared # start with this one, otherwise other packages will miss the dependency
+docker-compose up --build
 yarn dev:frontend
 yarn dev:mobile
-docker-compose up --build
 ```
 
 By default, frontend listens on `localhost:3000` and backend on `localhost:8000`.
