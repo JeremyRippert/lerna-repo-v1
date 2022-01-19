@@ -6,7 +6,6 @@
     "production": {
       "node": "16.13.0",
       "env": {
-        "BASE_BACKEND_URL": "https://jeremyrdjangotemplate.herokuapp.com/",
         "ENTRY_FILE": "./__generated__/AppEntry.js"
       }
     },
