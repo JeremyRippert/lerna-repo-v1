@@ -7,7 +7,6 @@
     "outDir": "./dist",
     "baseUrl": "./src",
     "incremental": true,
-    "noEmit": true,
     "forceConsistentCasingInFileNames": false,
     "target": "es2017"
   },

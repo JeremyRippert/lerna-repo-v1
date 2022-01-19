@@ -948,3 +948,24 @@ Now that every app is deployed I will:
 - add an ORM and a DB connexion for Nest
 - check that all dev tools are setup
 - start implementing features
+
+## Cloning the repo
+
+After I first cloned the repo, everything was working fine.
+I cloned it again, and now `yarn dev:backend` fails with
+
+```
+@monorepo/backend: Error: Cannot find module '/home/jeremy/dev/jeremy/templates/lerna-repo-v1/packages/backend/dist/main'
+@monorepo/backend:     at Function.Module._resolveFilename (internal/modules/cjs/loader.js:902:15)
+@monorepo/backend:     at Function.Module._load (internal/modules/cjs/loader.js:746:27)
+@monorepo/backend:     at Function.executeUserEntryPoint [as runMain] (internal/modules/run_main.js:76:12)
+@monorepo/backend:     at internal/main/run_main_module.js:17:47
+```
+
+Let's try building the backend and retrying.
+
+The output of `yarn build:backend` is strange, there is nothing in `dist` except `tsconfig.build.tsbuildinfo`.
+
+I had added `"noEmit": true` in `backend/tsconfig.json`, which breaks Nest in dev and prod.
+
+The fix was to remove it, and add the `--noEmit` flag to the tsc command in `backend/package.json`.
