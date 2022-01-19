@@ -969,3 +969,7 @@ The output of `yarn build:backend` is strange, there is nothing in `dist` except
 I had added `"noEmit": true` in `backend/tsconfig.json`, which breaks Nest in dev and prod.
 
 The fix was to remove it, and add the `--noEmit` flag to the tsc command in `backend/package.json`.
+
+I also noticed an error when building the apk, eas couldn't find `@monorepo/shared`. I'm guessing it's because `dist` wasn't pushed to eas. Why did it work before? I don't know. Maybe I added it to `.gitignore` after its creation and it was pushed.
+
+In any case, I fixed the issue by adding `"eas-build-post-install": "cd ../.. && yarn build:shared",` in `mobile/package.json`, which is triggered after eas installs dependencies.
