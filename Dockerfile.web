@@ -14,4 +14,7 @@ RUN yarn install
 RUN lerna bootstrap
 COPY . .
 
-CMD [ "yarn", "dev:backend" ]
+RUN yarn build:shared
+RUN yarn build:backend
+
+CMD node packages/backend/dist/src/main

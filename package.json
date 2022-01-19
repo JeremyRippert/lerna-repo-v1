@@ -8,8 +8,6 @@
     "dev:mobile": "lerna run --scope @monorepo/mobile --stream start",
     "dev:shared": "lerna run --scope @monorepo/shared --stream watch",
     "dev:mobile:clear": "lerna run --scope @monorepo/mobile --stream start:clear",
-    "build:backend": "lerna run --scope @monorepo/backend --stream build",
-    "build:shared": "lerna run --scope @monorepo/shared --stream build",
     "build": "lerna run build --stream",
     "watch": "lerna run watch --stream",
     "clean": "lerna run clean --parallel",
@@ -18,6 +16,8 @@
     "tsc": "lerna run tsc  --parallel",
     "build:vercel": "yarn build:shared && cd packages/frontend && yarn run next build && cd ../.. && cp -r ./packages/frontend/.next . && cp -r ./packages/frontend/src/public .",
     "build:apk": "lerna run --scope=@monorepo/mobile --stream build:apk",
+    "build:backend": "lerna run --scope @monorepo/backend --stream build",
+    "build:shared": "lerna run --scope @monorepo/shared --stream build",
     "backend:prod": "lerna run --scope @monorepo/backend --stream start:prod"
   },
   "dependencies": {

@@ -773,7 +773,7 @@ It works! :tada:
 
 ## Dockerize backend, add postgres
 
-Let's add `docker-compose.yml` and `Dockerfile.local` to begin with. First, I create them at root so I can access `shared` in Dockerfile.
+Let's add `docker-compose.yml` and `Dockerfile.local` to begin with. First, I create them at root so I can access `shared` from the dockerfile.
 
 `docker-compose.yaml`
 
@@ -828,14 +828,114 @@ RUN yarn install
 RUN lerna bootstrap
 COPY . .
 
-EXPOSE 3000
-
 CMD [ "yarn", "dev:backend" ]
 ```
 
 With this configuration, we have hot reload on `backend`, and if we run `yarn dev:shared` in parallel, also hot reload on `shared`.
+It is important to note that `WORKDIR` in dockerfile has the same path as `services.backend.volumes` for hot reload to work, in our case we have:
+
+```
+services:
+  backend:
+    [...]
+    volumes:
+      - ./:/usr/src/app
+```
+
+And
+
+```
+WORKDIR /usr/src/app
+```
 
 The only other tweak I had to do is put `"@monorepo/shared": "file:../shared",` in `backend/package.json`. Let's check if it was necessary.
 If I put it back as before, it works too.
 
 Note: db seems to persist between up & down.
+
+## Run NestJS with Dockerfile.prod
+
+I created a `Dockerfile.prod`
+
+```
+FROM node:14.18-alpine
+
+RUN npm i -g lerna
+
+WORKDIR /usr/src/app
+
+COPY package.json ./
+COPY yarn.lock ./
+COPY packages/backend/package.json ./packages/backend/
+COPY packages/shared/package.json ./packages/shared/
+COPY lerna.json ./
+RUN yarn install
+
+RUN lerna bootstrap
+COPY . .
+
+RUN yarn build:shared
+RUN yarn build:backend
+
+CMD [ "yarn", "backend:prod" ]
+```
+
+To build it, run `docker build -f Dockerfile.prod -t backend .`
+To run it, run `docker run -d -p 3000:3000 backend`. Here, `-d` makes it run in detached mode, and `-p 3000:3000` tells docker to direct local port 3000 to port 3000 in the docker.
+To stop it, run `docker ps -a` to get the `container_id`, then `docker kill <container_id>`.
+
+## Deploy NestJS to Heroku
+
+To deploy docker to heroku, first login and set the stack to `container`:
+
+```
+heroku login
+heroku git:remote -a jeremyr-nestjs-docker
+heroku stack:set container
+heroku container:login
+```
+
+In Heroku, the process running must be `web`, otherwise we get these kinds of errors:
+
+```
+2022-01-19T12:56:13.678610+00:00 heroku[router]: at=error code=H14 desc="No web processes running" method=GET path="/" host=jeremyr-nestjs-docker.herokuapp.com request_id=54d4b8c3-ade8-45b5-9cf0-bcf9087f2412 fwd="109.5.248.128" dyno= connect= service= status=503 bytes= protocol=https
+```
+
+To push a dockerfile to heroku, run:
+
+```
+heroku container:push <process_type> --recursive --app <app_name>
+```
+
+Where process types refers to both the name of the process running (therefore it must be called `web`), and the extension of the dockerfile (`Dockerfile.<process_type>`). So I had to rename `Dockerfile.prod` to `Dockerfile.web` to solve the above error.
+After that, I encountered another error:
+
+```
+2022-01-19T13:27:26.237955+00:00 heroku[web.1]: Error R10 (Boot timeout) -> Web process failed to bind to $PORT within 60 seconds of launch
+2022-01-19T13:27:26.283776+00:00 heroku[web.1]: Stopping process with SIGKILL
+2022-01-19T13:27:26.434491+00:00 heroku[web.1]: Process exited with status 137
+2022-01-19T13:27:26.664652+00:00 heroku[web.1]: State changed from starting to crashed
+2022-01-19T13:27:29.888526+00:00 heroku[router]: at=error code=H10 desc="App crashed" method=GET path="/" host=jeremyr-nestjs-docker.herokuapp.com request_id=f90a9283-edf9-4f94-8002-c70bb8c26b29 fwd="109.5.248.128" dyno= connect= service= status=503 bytes= protocol=https
+```
+
+Which means that the application didn't bind to the port exposed by Heroku. To do so, we need to make a small change in `backend/src/main.ts`:
+
+`await app.listen(process.env.PORT || 3000);` instead of `await app.listen(3000);`
+
+Then, we can run
+
+`heroku container:push web --recursive --app <app_name>`, or even `heroku container:push web --recursive`
+
+And finally
+
+`heroku container:release web`.
+
+NestJs now runs on heroku! :tada:
+
+## Next steps
+
+Now that every app is deployed I will:
+
+- add an ORM and a DB connexion for Nest
+- check that all dev tools are setup
+- start implementing features
